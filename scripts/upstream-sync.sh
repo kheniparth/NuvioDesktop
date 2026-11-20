@@ -9,6 +9,15 @@ set -euo pipefail
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
 
+# Paperclip/WSL runners often have GIT_CONFIG_GLOBAL=/dev/null (no user.*).
+# Merge commits need an identity; allow override via GIT_AUTHOR_* / GIT_COMMITTER_*.
+if [[ -z "${GIT_AUTHOR_EMAIL:-}" ]] && ! git config user.email >/dev/null 2>&1; then
+  export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-Paperclip}"
+  export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-noreply@paperclip.ing}"
+  export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-$GIT_AUTHOR_NAME}"
+  export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-$GIT_AUTHOR_EMAIL}"
+fi
+
 [[ "$(git rev-parse --abbrev-ref HEAD)" == "Dev" ]] || { echo "checkout Dev first" >&2; exit 1; }
 if ! git diff --quiet || ! git diff --cached --quiet; then
   echo "working tree is dirty" >&2
