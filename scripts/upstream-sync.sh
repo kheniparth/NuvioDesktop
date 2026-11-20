@@ -49,14 +49,20 @@ fi
 run_checks() {
   # One Gradle invocation at a time on beast (RAM). Desktop tests, desktop
   # compile, then Android shared compile so commonMain still builds.
+  # WSL lacks pkg-config/libmpv for Linux native player; exclude those tasks.
+  local native_x=(
+    -x :composeMediaPlayer:buildNativeLinux
+    -x :composeMediaPlayer:cleanLegacyLinuxNativeResource
+    -x :composeApp:buildLinuxPlayerBridge
+  )
   echo "==> :composeApp:desktopTest"
-  ./gradlew :composeApp:desktopTest
+  ./gradlew :composeApp:desktopTest "${native_x[@]}"
   echo "PASS :composeApp:desktopTest"
   echo "==> :composeApp:compileKotlinDesktop"
-  ./gradlew :composeApp:compileKotlinDesktop
+  ./gradlew :composeApp:compileKotlinDesktop "${native_x[@]}"
   echo "PASS :composeApp:compileKotlinDesktop"
   echo "==> :composeApp:compileAndroidMain"
-  ./gradlew :composeApp:compileAndroidMain
+  ./gradlew :composeApp:compileAndroidMain "${native_x[@]}"
   echo "PASS :composeApp:compileAndroidMain"
 }
 

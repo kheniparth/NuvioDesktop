@@ -18,27 +18,34 @@ Enhanced (copy files only) for Windows and macOS M1.
 
 ## Past work
 - 2026-11-17: Forked from NuvioMedia/NuvioDesktop; remotes `origin` + `upstream` configured.
-- 2026-11-20: [TEC-10](/TEC/issues/TEC-10) — adding AGENTS.md, PROGRESS.md, `scripts/upstream-sync.sh`, and
-  first upstream sync PR.
+- 2026-11-20: [TEC-10](/TEC/issues/TEC-10) — AGENTS.md, PROGRESS.md, `scripts/upstream-sync.sh`, first
+  upstream merge on `sync/upstream-20261120`, Gradle checks recorded (see Current state).
 
 ## Current state (2026-11-20)
-- First upstream sync branch: `sync/upstream-20261120` (docs + script + merge of upstream/Dev through
-  `bcb930c2d`). Checks need a local `local.properties` (`sdk.dir`); do not commit it.
+- Branch `sync/upstream-20261120`: docs + sync script + merge of `upstream/Dev` through `bcb930c2d`.
+- Dirty-tree guard verified earlier (exit 1, no change).
+- Gradle needs local gitignored `local.properties` (`sdk.dir=...`); present on this machine, not committed.
+- WSL native player toolchain missing (`pkg-config` / `libmpv-dev` / gstreamer). Checks must use:
+  `-x :composeMediaPlayer:buildNativeLinux -x :composeMediaPlayer:cleanLegacyLinuxNativeResource -x :composeApp:buildLinuxPlayerBridge`
+  (now baked into `scripts/upstream-sync.sh` and documented in AGENTS.md).
+- Check results on `sync/upstream-20261120` (2026-11-20):
+  - `:composeApp:desktopTest` with native exclusions: **FAIL** — 2029 tests, 2 failed, 11 skipped.
+    - `NativePlayerControllerTeardownTest.sourceGapsDisposeSuccessfulSupersededCreatesBeforeReplacementPublication`: `AssertionError: Expected value to be true.` at `NativePlayerControllerTeardownTest.kt:118`
+    - `SettingsNavigationTest.bufferOptionsFollowThePlatformAndPlaybackEngine`: `AssertionError: expected:<true> but was:<false>` at `SettingsNavigationTest.kt:39`
+  - `:composeApp:compileKotlinDesktop` with native exclusions: **PASS**
+  - `:composeApp:compileAndroidMain` with native exclusions: **FAIL** — unresolved `PointerButton` / `onPointerEvent` / `button` in commonMain (`MainAppContent.kt`, `HomePosterHoverPreview.kt`, `PlayerScreenContent.kt`). Upstream commonMain desktop pointer APIs do not resolve on the Android shared compile target.
+- Branch not yet pushed; managed GitHub identity unavailable on agent runs (broker returns `status:unavailable`).
 - No Live TV code in this checkout yet.
-- Shared WSL checkout may also be used by [TEC-9](/TEC/issues/TEC-9); commit small, no rebase/reset.
 
 ## Next steps
-1. Finish [TEC-10](/TEC/issues/TEC-10): merge the sync PR after tester pass + senior review.
+1. Finish [TEC-10](/TEC/issues/TEC-10): push `sync/upstream-20261120`, open PR against `Dev`, tester pass, then senior review + merge.
 2. Port Enhanced `features/livetv/` (and settings/player wiring) by copying files — never merge Enhanced.
 3. Reuse from `windows-desktop` @ `7a790e185`: desktop `LiveTvStorage` actual, `--windows` bootstrap,
    packaging helpers. Confirm libmpv header support for channel URLs.
 4. macOS builds need the Mac or a macOS CI runner (owner checks by hand).
 
 ## How to build and test (Desktop)
-- Checks (one Gradle build at a time on beast):
-  - `./gradlew :composeApp:desktopTest`
-  - `./gradlew :composeApp:compileKotlinDesktop`
-  - `./gradlew :composeApp:compileAndroidMain` (shared common code; there is no `compileDebugKotlinAndroid` here)
+- Checks (one Gradle build at a time on beast); see AGENTS.md for the native-exclusion array.
 - Upstream: `bash scripts/upstream-sync.sh` from a clean `Dev` (creates `sync/upstream-YYYYMMDD`, runs
   checks, does not push).
 - Parth checks Windows (and Mac for macOS) by hand.
@@ -49,6 +56,7 @@ Enhanced (copy files only) for Windows and macOS M1.
 - Never touch `NuvioMedia/*` on GitHub. PRs only against `kheniparth/NuvioDesktop` base `Dev`.
 - WSL only for Gradle. One Gradle build at a time on beast.
 - `.factory/` is out of scope for this repo.
+- On WSL, skip Linux native player tasks (listed above) rather than installing apt packages mid-issue.
 
 ## Gotchas
 - Base branch is `Dev` (capital D), unlike NuvioTV's `dev`.
@@ -57,6 +65,7 @@ Enhanced (copy files only) for Windows and macOS M1.
   for `gh` when needed. Paperclip API similarly: `http://127.0.0.1:3100`.
 - GitHub Issues are disabled on this fork; track work in Paperclip.
 - Managed git wrappers ignore `GIT_AUTHOR_*`; `scripts/upstream-sync.sh` uses `git -c user.*` for merges.
+- Agent runs often have no managed GitHub identity (`runtime-tools/github/credentials` → unavailable); push/PR then needs Parth or a run with identity.
 
 ## Secrets (never commit)
 `local.properties`, keystores and passwords, any `.env` used for Live TV provider bootstrap

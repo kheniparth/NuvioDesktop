@@ -19,10 +19,18 @@ Fork of NuvioMedia/NuvioDesktop (Windows + macOS M1) adding Live TV ported from 
 
 ## Checks (run one at a time)
 
+WSL on beast lacks the Linux native player toolchain (`pkg-config`, `libmpv-dev`, gstreamer).
+Exclude those tasks or every check fails at CMake before Kotlin runs:
+
 ```bash
-./gradlew :composeApp:desktopTest
-./gradlew :composeApp:compileKotlinDesktop
-./gradlew :composeApp:compileAndroidMain
+NATIVE_X=(
+  -x :composeMediaPlayer:buildNativeLinux
+  -x :composeMediaPlayer:cleanLegacyLinuxNativeResource
+  -x :composeApp:buildLinuxPlayerBridge
+)
+./gradlew :composeApp:desktopTest "${NATIVE_X[@]}"
+./gradlew :composeApp:compileKotlinDesktop "${NATIVE_X[@]}"
+./gradlew :composeApp:compileAndroidMain "${NATIVE_X[@]}"
 ```
 
 (`compileDebugKotlinAndroid` does not exist on this project; shared Android/common compile is
@@ -32,4 +40,5 @@ Fork of NuvioMedia/NuvioDesktop (Windows + macOS M1) adding Live TV ported from 
 ## Upstream sync
 
 From a clean `Dev`: `bash scripts/upstream-sync.sh` creates `sync/upstream-YYYYMMDD`, merges
-`upstream/Dev`, runs the checks above, and does **not** push. Open the sync PR yourself.
+`upstream/Dev`, runs the checks above (with the native exclusions), and does **not** push.
+Open the sync PR yourself.
