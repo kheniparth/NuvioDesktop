@@ -22,6 +22,10 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   exit 1
 fi
 git remote get-url upstream >/dev/null 2>&1 || { echo "no upstream remote" >&2; exit 1; }
+if [[ ! -f local.properties ]]; then
+  echo "missing local.properties (sdk.dir=...); create it locally, do not commit" >&2
+  exit 1
+fi
 
 branch="sync/upstream-$(date +%Y%m%d)"
 if git show-ref --verify --quiet "refs/heads/$branch"; then

@@ -22,9 +22,10 @@ Enhanced (copy files only) for Windows and macOS M1.
   first upstream sync PR.
 
 ## Current state (2026-11-20)
-- Fork tracks upstream; no Live TV code in this checkout yet.
-- Agent docs and upstream sync script are being added on `paperclip/TEC-10-fork-setup`.
-- Shared WSL checkout may also be used by [TEC-9](/TEC/issues/TEC-9) (Live TV epic); commit small, no rebase/reset.
+- First upstream sync branch: `sync/upstream-20261120` (docs + script + merge of upstream/Dev through
+  `bcb930c2d`). Checks need a local `local.properties` (`sdk.dir`); do not commit it.
+- No Live TV code in this checkout yet.
+- Shared WSL checkout may also be used by [TEC-9](/TEC/issues/TEC-9); commit small, no rebase/reset.
 
 ## Next steps
 1. Finish [TEC-10](/TEC/issues/TEC-10): merge the sync PR after tester pass + senior review.
@@ -51,9 +52,11 @@ Enhanced (copy files only) for Windows and macOS M1.
 
 ## Gotchas
 - Base branch is `Dev` (capital D), unlike NuvioTV's `dev`.
+- `local.properties` is required for Gradle (gitignored). Without it, `:composeApp:generateRuntimeConfigs` fails.
 - Public Paperclip/GitHub broker URL may SSO-gate; use `PAPERCLIP_GITHUB_BROKER_URL=http://127.0.0.1:3100`
-  for `gh` when needed.
+  for `gh` when needed. Paperclip API similarly: `http://127.0.0.1:3100`.
 - GitHub Issues are disabled on this fork; track work in Paperclip.
+- Managed git wrappers ignore `GIT_AUTHOR_*`; `scripts/upstream-sync.sh` uses `git -c user.*` for merges.
 
 ## Secrets (never commit)
 `local.properties`, keystores and passwords, any `.env` used for Live TV provider bootstrap

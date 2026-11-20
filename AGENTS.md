@@ -13,6 +13,9 @@ Fork of NuvioMedia/NuvioDesktop (Windows + macOS M1) adding Live TV ported from 
 - Never open a PR, issue or comment on `NuvioMedia/*`. PRs target `kheniparth/NuvioDesktop`, base `Dev`.
 - **Never merge Nuvio Enhanced into this fork** (~1,050 compile errors). Copy Live TV files in.
 - One Gradle build at a time on beast (~13 GB of ~23 GB WSL RAM).
+- Needs a local (gitignored) `local.properties` with at least `sdk.dir=...` pointing at the
+  Android SDK (e.g. `/home/techmuzz/Android/Sdk`). Gradle 9 fails `generateRuntimeConfigs` if it
+  is missing.
 
 ## Checks (run one at a time)
 
