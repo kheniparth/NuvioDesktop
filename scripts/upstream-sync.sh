@@ -9,13 +9,11 @@ set -euo pipefail
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
 
-# Paperclip/WSL runners often have GIT_CONFIG_GLOBAL=/dev/null (no user.*).
-# Merge commits need an identity; allow override via GIT_AUTHOR_* / GIT_COMMITTER_*.
-if [[ -z "${GIT_AUTHOR_EMAIL:-}" ]] && ! git config user.email >/dev/null 2>&1; then
-  export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-Paperclip}"
-  export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-noreply@paperclip.ing}"
-  export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-$GIT_AUTHOR_NAME}"
-  export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-$GIT_AUTHOR_EMAIL}"
+# Paperclip/WSL runners often have GIT_CONFIG_GLOBAL=/dev/null (no user.*),
+# and env GIT_AUTHOR_* is ignored by the managed git wrapper. Prefer -c.
+git_id=( )
+if ! git config user.email >/dev/null 2>&1; then
+  git_id=( -c user.name="${GIT_AUTHOR_NAME:-Paperclip}" -c user.email="${GIT_AUTHOR_EMAIL:-noreply@paperclip.ing}" )
 fi
 
 [[ "$(git rev-parse --abbrev-ref HEAD)" == "Dev" ]] || { echo "checkout Dev first" >&2; exit 1; }
@@ -34,7 +32,7 @@ fi
 old="$(git rev-parse HEAD)"
 git fetch upstream
 git switch -c "$branch"
-git merge --no-edit upstream/Dev
+git "${git_id[@]}" merge --no-edit upstream/Dev
 
 echo "upstream commits:"
 lines="$(git --no-pager log --format='%h %s' "$old..upstream/Dev")"
