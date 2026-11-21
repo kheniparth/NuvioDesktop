@@ -22,19 +22,25 @@ Enhanced (copy files only) for Windows and macOS M1.
   upstream merge on `sync/upstream-20261120`, Gradle checks recorded (see Current state).
 - 2026-11-21: [TEC-10](/TEC/issues/TEC-10) — Tester3 PASS (`desktopTest` 2 of 2029 failures recorded);
   Architect 2 reviewed as a Parth-authorized one-off (no non-author senior developer was free) and merged
-  [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) into `Dev` as `178459874`.
+  [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) into `Dev` as `178459874`; docs follow-up
+  [PR #11](https://github.com/kheniparth/NuvioDesktop/pull/11) → `baa29326c`.
+- 2026-11-21: [TEC-11](/TEC/issues/TEC-11) — worktree + branch `paperclip/TEC-11-livetv-data` created;
+  sub-task 1 filed as [TEC-97](/TEC/issues/TEC-97) for Dev1.
 
 ## Current state (2026-11-21)
-- `Dev` is `178459874` (PR #10 merge): `AGENTS.md`, `PROGRESS.md`, `scripts/upstream-sync.sh`, and the
-  upstream `Dev` merge through `bcb930c2d`.
+- `Dev` is `baa29326c` (PR #11 docs follow-up on top of PR #10 `178459874`): `AGENTS.md`,
+  `PROGRESS.md`, `scripts/upstream-sync.sh`, and the upstream `Dev` merge through `bcb930c2d`.
 - `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
-- Dirty-tree guard verified (exit 1, no change).
+- [TEC-11](/TEC/issues/TEC-11) unblocked after [TEC-10](/TEC/issues/TEC-10). Worktree:
+  `/home/techmuzz/nuvio/scratch/nuvio-desktop-tec-11` on `paperclip/TEC-11-livetv-data` @ `baa29326c`.
+  Sub-task 1 is [TEC-97](/TEC/issues/TEC-97) (copy AppFileCache + data files). No Live TV code in the
+  tree yet.
 - Gradle needs a local gitignored `local.properties` (`sdk.dir=...`) and `JAVA_HOME` pointing at a JDK 21
   (`$HOME/.local/sdk/jdk-21` on beast). Both are local, not committed.
 - WSL native player toolchain missing (`pkg-config` / `libmpv-dev` / gstreamer). Checks must use:
   `-x :composeMediaPlayer:buildNativeLinux -x :composeMediaPlayer:cleanLegacyLinuxNativeResource -x :composeApp:buildLinuxPlayerBridge`
   (now baked into `scripts/upstream-sync.sh` and documented in AGENTS.md).
-- Check results (recorded on the sync branch head `e69090674`, tree identical to `Dev` `178459874`):
+- Check results (recorded on the sync branch head `e69090674`, still the baseline for Dev):
   - `:composeApp:desktopTest` with native exclusions: **FAIL** — 2029 tests, 2 failed, 11 skipped.
     - `NativePlayerControllerTeardownTest.sourceGapsDisposeSuccessfulSupersededCreatesBeforeReplacementPublication`: `AssertionError: Expected value to be true.` at `NativePlayerControllerTeardownTest.kt:118`
     - `SettingsNavigationTest.bufferOptionsFollowThePlatformAndPlaybackEngine`: `AssertionError: expected:<true> but was:<false>` at `SettingsNavigationTest.kt:39`
@@ -56,15 +62,13 @@ Enhanced (copy files only) for Windows and macOS M1.
     e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:166:46 Unresolved reference 'button'.
     e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:166:56 Unresolved reference 'PointerButton'.
     ```
-- [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) is `MERGED` (2026-11-21T04:34:25Z).
-  Managed GitHub identity resolved via [TEC-53](/TEC/issues/TEC-53).
-- No Live TV code in this checkout yet.
+- [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) and
+  [PR #11](https://github.com/kheniparth/NuvioDesktop/pull/11) are `MERGED`.
 
 ## Next steps
-1. Port Enhanced `features/livetv/` (and settings/player wiring) by copying files — never merge Enhanced.
-2. Reuse from `windows-desktop` @ `7a790e185`: desktop `LiveTvStorage` actual, `--windows` bootstrap,
-   packaging helpers. Confirm libmpv header support for channel URLs.
-3. macOS builds need the Mac or a macOS CI runner (owner checks by hand).
+1. Finish [TEC-97](/TEC/issues/TEC-97) (copy AppFileCache + Live TV data files into the TEC-11 worktree).
+2. On [TEC-11](/TEC/issues/TEC-11): Stalker gate + 401 refresh, then shared tests; one PR, three commits.
+3. Later: settings/player wiring and UI issues; macOS builds need the Mac or a macOS CI runner.
 4. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 
 ## How to build and test (Desktop)
