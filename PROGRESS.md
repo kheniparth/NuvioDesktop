@@ -1,6 +1,6 @@
 # NuvioDesktop progress
 
-Last updated: 2026-11-20. Single source of truth for picking Desktop fork work back up with any agent.
+Last updated: 2026-11-21. Single source of truth for picking Desktop fork work back up with any agent.
 Update it at the end of every work session (see [AGENTS.md](AGENTS.md)). Cross-repo plan and TV
 progress: `~/nuvio/nuvio-tv/PROGRESS.md` and `~/nuvio/nuvio-tv/LIVE_TV_PORT_PLAN.md`.
 
@@ -21,7 +21,7 @@ Enhanced (copy files only) for Windows and macOS M1.
 - 2026-11-20: [TEC-10](/TEC/issues/TEC-10) — AGENTS.md, PROGRESS.md, `scripts/upstream-sync.sh`, first
   upstream merge on `sync/upstream-20261120`, Gradle checks recorded (see Current state).
 
-## Current state (2026-11-20)
+## Current state (2026-11-21)
 - Branch `sync/upstream-20261120`: docs + sync script + merge of `upstream/Dev` through `bcb930c2d`.
 - Dirty-tree guard verified earlier (exit 1, no change).
 - Gradle needs local gitignored `local.properties` (`sdk.dir=...`); present on this machine, not committed.
@@ -34,11 +34,11 @@ Enhanced (copy files only) for Windows and macOS M1.
     - `SettingsNavigationTest.bufferOptionsFollowThePlatformAndPlaybackEngine`: `AssertionError: expected:<true> but was:<false>` at `SettingsNavigationTest.kt:39`
   - `:composeApp:compileKotlinDesktop` with native exclusions: **PASS**
   - `:composeApp:compileAndroidMain` with native exclusions: **FAIL** — unresolved `PointerButton` / `onPointerEvent` / `button` in commonMain (`MainAppContent.kt`, `HomePosterHoverPreview.kt`, `PlayerScreenContent.kt`). Upstream commonMain desktop pointer APIs do not resolve on the Android shared compile target.
-- Branch not yet pushed; managed GitHub identity unavailable on agent runs (broker returns `status:unavailable`).
+- Pushed and PR open: https://github.com/kheniparth/NuvioDesktop/pull/10 (base `Dev`). Managed GitHub identity resolved via [TEC-53](/TEC/issues/TEC-53).
 - No Live TV code in this checkout yet.
 
 ## Next steps
-1. Finish [TEC-10](/TEC/issues/TEC-10): push `sync/upstream-20261120`, open PR against `Dev`, tester pass, then senior review + merge.
+1. Finish [TEC-10](/TEC/issues/TEC-10): tester pass on PR #10, then senior review + merge (not the author).
 2. Port Enhanced `features/livetv/` (and settings/player wiring) by copying files — never merge Enhanced.
 3. Reuse from `windows-desktop` @ `7a790e185`: desktop `LiveTvStorage` actual, `--windows` bootstrap,
    packaging helpers. Confirm libmpv header support for channel URLs.
@@ -65,7 +65,7 @@ Enhanced (copy files only) for Windows and macOS M1.
   for `gh` when needed. Paperclip API similarly: `http://127.0.0.1:3100`.
 - GitHub Issues are disabled on this fork; track work in Paperclip.
 - Managed git wrappers ignore `GIT_AUTHOR_*`; `scripts/upstream-sync.sh` uses `git -c user.*` for merges.
-- Agent runs often have no managed GitHub identity (`runtime-tools/github/credentials` → unavailable); push/PR then needs Parth or a run with identity.
+- Agent runs need a dedicated (agent-scoped) managed GitHub grant for SD3 company-default wakes; personal board grants alone are ignored for those runs.
 
 ## Secrets (never commit)
 `local.properties`, keystores and passwords, any `.env` used for Live TV provider bootstrap
