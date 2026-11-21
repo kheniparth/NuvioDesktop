@@ -20,29 +20,52 @@ Enhanced (copy files only) for Windows and macOS M1.
 - 2026-11-17: Forked from NuvioMedia/NuvioDesktop; remotes `origin` + `upstream` configured.
 - 2026-11-20: [TEC-10](/TEC/issues/TEC-10) — AGENTS.md, PROGRESS.md, `scripts/upstream-sync.sh`, first
   upstream merge on `sync/upstream-20261120`, Gradle checks recorded (see Current state).
+- 2026-11-21: [TEC-10](/TEC/issues/TEC-10) — Tester3 PASS (`desktopTest` 2 of 2029 failures recorded);
+  Architect 2 reviewed as a Parth-authorized one-off (no non-author senior developer was free) and merged
+  [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) into `Dev` as `178459874`.
 
 ## Current state (2026-11-21)
-- Branch `sync/upstream-20261120`: docs + sync script + merge of `upstream/Dev` through `bcb930c2d`.
-- Dirty-tree guard verified earlier (exit 1, no change).
-- Gradle needs local gitignored `local.properties` (`sdk.dir=...`); present on this machine, not committed.
+- `Dev` is `178459874` (PR #10 merge): `AGENTS.md`, `PROGRESS.md`, `scripts/upstream-sync.sh`, and the
+  upstream `Dev` merge through `bcb930c2d`.
+- `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
+- Dirty-tree guard verified (exit 1, no change).
+- Gradle needs a local gitignored `local.properties` (`sdk.dir=...`) and `JAVA_HOME` pointing at a JDK 21
+  (`$HOME/.local/sdk/jdk-21` on beast). Both are local, not committed.
 - WSL native player toolchain missing (`pkg-config` / `libmpv-dev` / gstreamer). Checks must use:
   `-x :composeMediaPlayer:buildNativeLinux -x :composeMediaPlayer:cleanLegacyLinuxNativeResource -x :composeApp:buildLinuxPlayerBridge`
   (now baked into `scripts/upstream-sync.sh` and documented in AGENTS.md).
-- Check results on `sync/upstream-20261120` (2026-11-20):
+- Check results (recorded on the sync branch head `e69090674`, tree identical to `Dev` `178459874`):
   - `:composeApp:desktopTest` with native exclusions: **FAIL** — 2029 tests, 2 failed, 11 skipped.
     - `NativePlayerControllerTeardownTest.sourceGapsDisposeSuccessfulSupersededCreatesBeforeReplacementPublication`: `AssertionError: Expected value to be true.` at `NativePlayerControllerTeardownTest.kt:118`
     - `SettingsNavigationTest.bufferOptionsFollowThePlatformAndPlaybackEngine`: `AssertionError: expected:<true> but was:<false>` at `SettingsNavigationTest.kt:39`
   - `:composeApp:compileKotlinDesktop` with native exclusions: **PASS**
-  - `:composeApp:compileAndroidMain` with native exclusions: **FAIL** — unresolved `PointerButton` / `onPointerEvent` / `button` in commonMain (`MainAppContent.kt`, `HomePosterHoverPreview.kt`, `PlayerScreenContent.kt`). Upstream commonMain desktop pointer APIs do not resolve on the Android shared compile target.
-- Pushed and PR open: https://github.com/kheniparth/NuvioDesktop/pull/10 (base `Dev`). Managed GitHub identity resolved via [TEC-53](/TEC/issues/TEC-53).
+  - `:composeApp:compileAndroidMain` with native exclusions: **FAIL** — unresolved `PointerButton` /
+    `onPointerEvent` / `button` in commonMain (`MainAppContent.kt`, `HomePosterHoverPreview.kt`,
+    `PlayerScreenContent.kt`). Upstream commonMain desktop pointer APIs do not resolve on the Android
+    shared compile target. Verbatim compiler output (Gradle daemon log of the failing run; all line
+    numbers re-checked against `Dev` `178459874`):
+    ```text
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/MainAppContent.kt:205:42 Unresolved reference 'PointerButton'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/MainAppContent.kt:1365:51 Unresolved reference 'button'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/MainAppContent.kt:1365:61 Unresolved reference 'PointerButton'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/home/components/HomePosterHoverPreview.kt:59:42 Unresolved reference 'onPointerEvent'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/home/components/HomePosterHoverPreview.kt:332:30 Unresolved reference 'onPointerEvent'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:19:42 Unresolved reference 'PointerButton'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:164:39 Unresolved reference 'button'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:164:49 Unresolved reference 'PointerButton'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:166:46 Unresolved reference 'button'.
+    e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:166:56 Unresolved reference 'PointerButton'.
+    ```
+- [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) is `MERGED` (2026-11-21T04:34:25Z).
+  Managed GitHub identity resolved via [TEC-53](/TEC/issues/TEC-53).
 - No Live TV code in this checkout yet.
 
 ## Next steps
-1. Finish [TEC-10](/TEC/issues/TEC-10): tester pass on PR #10, then senior review + merge (not the author).
-2. Port Enhanced `features/livetv/` (and settings/player wiring) by copying files — never merge Enhanced.
-3. Reuse from `windows-desktop` @ `7a790e185`: desktop `LiveTvStorage` actual, `--windows` bootstrap,
+1. Port Enhanced `features/livetv/` (and settings/player wiring) by copying files — never merge Enhanced.
+2. Reuse from `windows-desktop` @ `7a790e185`: desktop `LiveTvStorage` actual, `--windows` bootstrap,
    packaging helpers. Confirm libmpv header support for channel URLs.
-4. macOS builds need the Mac or a macOS CI runner (owner checks by hand).
+3. macOS builds need the Mac or a macOS CI runner (owner checks by hand).
+4. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 
 ## How to build and test (Desktop)
 - Checks (one Gradle build at a time on beast); see AGENTS.md for the native-exclusion array.
@@ -61,6 +84,10 @@ Enhanced (copy files only) for Windows and macOS M1.
 ## Gotchas
 - Base branch is `Dev` (capital D), unlike NuvioTV's `dev`.
 - `local.properties` is required for Gradle (gitignored). Without it, `:composeApp:generateRuntimeConfigs` fails.
+- `JAVA_HOME` must be a JDK 21 (`export JAVA_HOME=$HOME/.local/sdk/jdk-21` on beast); the wrapper exits
+  with `JAVA_HOME is not set` otherwise.
+- Every PR body must fill the sections in `.github/PULL_REQUEST_TEMPLATE.md`; the `validate_pr_body` CI
+  job fails otherwise. The factory handoff block alone is not enough — keep both in the body.
 - Public Paperclip/GitHub broker URL may SSO-gate; use `PAPERCLIP_GITHUB_BROKER_URL=http://127.0.0.1:3100`
   for `gh` when needed. Paperclip API similarly: `http://127.0.0.1:3100`.
 - GitHub Issues are disabled on this fork; track work in Paperclip.

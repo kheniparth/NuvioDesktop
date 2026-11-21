@@ -19,6 +19,9 @@ Fork of NuvioMedia/NuvioDesktop (Windows + macOS M1) adding Live TV ported from 
 
 ## Checks (run one at a time)
 
+Set `JAVA_HOME` to a JDK 21 first (`export JAVA_HOME=$HOME/.local/sdk/jdk-21` on beast); the wrapper
+exits with `JAVA_HOME is not set` otherwise.
+
 WSL on beast lacks the Linux native player toolchain (`pkg-config`, `libmpv-dev`, gstreamer).
 Exclude those tasks or every check fails at CMake before Kotlin runs:
 
@@ -42,3 +45,12 @@ NATIVE_X=(
 From a clean `Dev`: `bash scripts/upstream-sync.sh` creates `sync/upstream-YYYYMMDD`, merges
 `upstream/Dev`, runs the checks above (with the native exclusions), and does **not** push.
 Open the sync PR yourself.
+
+## Pull requests
+
+Fill the repo's [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) sections in every PR
+body. The `validate_pr_body` CI job fails a PR whose body lacks them, and the factory handoff block alone
+is not enough. Required headings: `Summary`, `PR type`, `Why`, `Desktop scope`, `Issue or approval`,
+`UI / behavior impact`, `Policy check`, `Scope boundaries`, `Testing`, `Screenshots / Video`,
+`Breaking changes`, `Linked issues`. Check exactly one PR type, at least one UI / behavior impact box, and
+every Policy check box. Keep the handoff block in the body as well.
