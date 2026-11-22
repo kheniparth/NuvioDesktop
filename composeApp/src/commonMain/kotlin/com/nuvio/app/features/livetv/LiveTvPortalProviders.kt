@@ -1,6 +1,8 @@
 package com.nuvio.app.features.livetv
 
+import com.nuvio.app.features.addons.RawHttpResponse
 import com.nuvio.app.features.addons.httpGetTextWithHeaders
+import com.nuvio.app.features.addons.httpRequestRaw
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
@@ -19,6 +21,12 @@ private val playlistRequestHeaders = mapOf("Accept" to "application/json, text/p
 // IPTV panels are made for IPTV players and often refuse or stall a browser's user agent, so
 // channels are opened as VLC opens them, as Nuvio TV does.
 private val streamRequestHeaders = mapOf("User-Agent" to LIVE_TV_STREAM_USER_AGENT, "Accept" to "*/*")
+
+/** Single test seam for Stalker HTTP (NuvioTV #78/#82 refresh-on-401). */
+internal var stalkerHttpGet: suspend (url: String, headers: Map<String, String>) -> RawHttpResponse =
+    { url, headers -> httpRequestRaw("GET", url, headers, body = "") }
+
+internal val liveTvStalkerGate = LiveTvStalkerGate()
 
 internal suspend fun fetchXtreamChannels(settings: LiveTvXtreamSettings): List<LiveTvChannel> {
     val normalized = settings.normalized()
@@ -154,13 +162,20 @@ internal suspend fun fetchStalkerEpgGuide(
 
 internal suspend fun preparePortalChannelForPlayback(channel: LiveTvChannel, settings: LiveTvStalkerSettings): LiveTvChannel {
     val command = channel.stalkerCommand?.takeIf(String::isNotBlank) ?: return channel
-    val session = stalkerSession(settings.normalized())
-    val result = stalkerRequest(session.settings, session.token, "itv", "create_link", mapOf("cmd" to command)).js()
-    val url = (result.string("cmd") ?: result.string("url") ?: result.string("stream_url"))?.playableUrl()
-    return channel.copy(
-        streamUrl = url?.takeIf(String::isNotBlank) ?: channel.streamUrl,
-        headers = channel.headers + stalkerHeaders(session.settings, session.token),
-    )
+    val normalized = settings.normalized()
+    return liveTvStalkerGate.open(
+        macAddress = normalized.macAddress,
+        channelId = channel.id,
+        stage = StalkerStage.Full,
+    ) {
+        val session = stalkerSession(normalized)
+        val result = stalkerRequest(session.settings, session.token, "itv", "create_link", mapOf("cmd" to command)).js()
+        val url = (result.string("cmd") ?: result.string("url") ?: result.string("stream_url"))?.playableUrl()
+        channel.copy(
+            streamUrl = url?.takeIf(String::isNotBlank) ?: channel.streamUrl,
+            headers = channel.headers + stalkerHeaders(session.settings, session.token),
+        )
+    }
 }
 
 private suspend fun stalkerSession(settings: LiveTvStalkerSettings): StalkerSession {
@@ -176,6 +191,7 @@ private suspend fun stalkerRequest(
     type: String,
     action: String,
     extra: Map<String, String> = emptyMap(),
+    allowRefresh: Boolean = true,
 ): JsonObject {
     val parameters = buildMap {
         put("type", type); put("action", action); put("JsHttpRequest", "1-xml")
@@ -188,7 +204,24 @@ private suspend fun stalkerRequest(
     val query = parameters.entries.joinToString("&", prefix = if ('?' in endpoint) "&" else "?") { (key, value) ->
         "${key.encodeURLParameter()}=${value.encodeURLParameter()}"
     }
-    return portalJson.parseToJsonElement(httpGetTextWithHeaders(endpoint + query, stalkerHeaders(settings, token))).jsonObject
+    val response = stalkerHttpGet(endpoint + query, stalkerHeaders(settings, token))
+    if (allowRefresh && !token.isNullOrBlank() && response.stalkerAuthFailed()) {
+        if (cachedStalkerSession?.token == token) cachedStalkerSession = null
+        return stalkerRequest(settings, stalkerSession(settings).token, type, action, extra, allowRefresh = false)
+    }
+    if (response.status !in 200..299) error("HTTP ${response.status}")
+    return portalJson.parseToJsonElement(response.body).jsonObject
+}
+
+private fun RawHttpResponse.stalkerAuthFailed(): Boolean {
+    if (status == 401) return true
+    val text = body.lowercase()
+    return "authorization failed" in text || "token expired" in text
+}
+
+/** Test helper: drop the cached Stalker handshake so fixtures can force a fresh token. */
+internal fun clearCachedStalkerSession() {
+    cachedStalkerSession = null
 }
 
 private fun stalkerHeaders(settings: LiveTvStalkerSettings, token: String?): Map<String, String> = buildMap {
