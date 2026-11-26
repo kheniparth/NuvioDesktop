@@ -1,6 +1,6 @@
 # NuvioDesktop progress
 
-Last updated: 2026-11-21. Single source of truth for picking Desktop fork work back up with any agent.
+Last updated: 2026-11-26. Single source of truth for picking Desktop fork work back up with any agent.
 Update it at the end of every work session (see [AGENTS.md](AGENTS.md)). Cross-repo plan and TV
 progress: `~/nuvio/nuvio-tv/PROGRESS.md` and `~/nuvio/nuvio-tv/LIVE_TV_PORT_PLAN.md`.
 
@@ -22,19 +22,31 @@ Enhanced (copy files only) for Windows and macOS M1.
   upstream merge on `sync/upstream-20261120`, Gradle checks recorded (see Current state).
 - 2026-11-21: [TEC-10](/TEC/issues/TEC-10) — Tester3 PASS (`desktopTest` 2 of 2029 failures recorded);
   Architect 2 reviewed as a Parth-authorized one-off (no non-author senior developer was free) and merged
-  [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) into `Dev` as `178459874`.
+  [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) into `Dev` as `178459874`; docs follow-up
+  [PR #11](https://github.com/kheniparth/NuvioDesktop/pull/11) → `baa29326c`.
+- 2026-11-21: [TEC-11](/TEC/issues/TEC-11) — worktree + branch `paperclip/TEC-11-livetv-data` created;
+  sub-task 1 filed as [TEC-97](/TEC/issues/TEC-97) for Dev1.
+- 2026-11-26: [TEC-11](/TEC/issues/TEC-11) — Live TV data layer landed on the branch in three code
+  commits: `32ac874d2` (AppFileCache + 8 data files + actuals), `d98d5ef5a` (Stalker gate + 401
+  refresh), `8043b4215` (16 shared tests). Sub-tasks [TEC-97](/TEC/issues/TEC-97),
+  [TEC-99](/TEC/issues/TEC-99) and [TEC-267](/TEC/issues/TEC-267) are done;
+  [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) is open to `Dev`, ready to test.
 
-## Current state (2026-11-21)
-- `Dev` is `178459874` (PR #10 merge): `AGENTS.md`, `PROGRESS.md`, `scripts/upstream-sync.sh`, and the
-  upstream `Dev` merge through `bcb930c2d`.
+## Current state (2026-11-26)
+- `Dev` is `baa29326c` (PR #11 docs follow-up on top of PR #10 `178459874`): `AGENTS.md`,
+  `PROGRESS.md`, `scripts/upstream-sync.sh`, and the upstream `Dev` merge through `bcb930c2d`.
 - `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
-- Dirty-tree guard verified (exit 1, no change).
+- [TEC-11](/TEC/issues/TEC-11) branch `paperclip/TEC-11-livetv-data` @ `8043b4215` (four commits ahead
+  of `Dev`): Live TV data layer for M3U/Xtream/Stalker, EPG parsing incl. gzip, `AppFileCache` +
+  `LiveTvStorage` actuals for desktop/Android/iOS, `LiveTvStalkerGate` with a once-only 401 re-handshake,
+  and 16 shared tests. No UI and nothing wired into a screen; PR #12 open to `Dev`.
+  In worktree `/home/techmuzz/nuvio/scratch/nuvio-desktop-tec-11`.
 - Gradle needs a local gitignored `local.properties` (`sdk.dir=...`) and `JAVA_HOME` pointing at a JDK 21
   (`$HOME/.local/sdk/jdk-21` on beast). Both are local, not committed.
 - WSL native player toolchain missing (`pkg-config` / `libmpv-dev` / gstreamer). Checks must use:
   `-x :composeMediaPlayer:buildNativeLinux -x :composeMediaPlayer:cleanLegacyLinuxNativeResource -x :composeApp:buildLinuxPlayerBridge`
   (now baked into `scripts/upstream-sync.sh` and documented in AGENTS.md).
-- Check results (recorded on the sync branch head `e69090674`, tree identical to `Dev` `178459874`):
+- Check results (recorded on the sync branch head `e69090674`, still the baseline for Dev):
   - `:composeApp:desktopTest` with native exclusions: **FAIL** — 2029 tests, 2 failed, 11 skipped.
     - `NativePlayerControllerTeardownTest.sourceGapsDisposeSuccessfulSupersededCreatesBeforeReplacementPublication`: `AssertionError: Expected value to be true.` at `NativePlayerControllerTeardownTest.kt:118`
     - `SettingsNavigationTest.bufferOptionsFollowThePlatformAndPlaybackEngine`: `AssertionError: expected:<true> but was:<false>` at `SettingsNavigationTest.kt:39`
@@ -56,16 +68,19 @@ Enhanced (copy files only) for Windows and macOS M1.
     e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:166:46 Unresolved reference 'button'.
     e: file:///home/techmuzz/nuvio/nuvio-desktop/composeApp/src/commonMain/kotlin/com/nuvio/app/features/player/PlayerScreenContent.kt:166:56 Unresolved reference 'PointerButton'.
     ```
-- [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) is `MERGED` (2026-11-21T04:34:25Z).
-  Managed GitHub identity resolved via [TEC-53](/TEC/issues/TEC-53).
-- No Live TV code in this checkout yet.
+- TEC-11 branch results (`8043b4215`, same native exclusions): `:composeApp:desktopTest` — 2045 tests,
+  2 failed, 11 skipped; the same two failures as the `Dev` baseline, and all 16 new Live TV tests pass.
+  `:composeApp:compileKotlinDesktop` — **PASS**. A mutation probe with the 401-refresh branch disabled
+  fails 2 of 3 `LiveTvStalkerPortalTest` cases. `:composeApp:compileAndroidMain` — not rerun on the
+  branch; the Live TV files add no Android-only error beyond the baseline above.
+- [PR #10](https://github.com/kheniparth/NuvioDesktop/pull/10) and
+  [PR #11](https://github.com/kheniparth/NuvioDesktop/pull/11) are `MERGED`.
 
 ## Next steps
-1. Port Enhanced `features/livetv/` (and settings/player wiring) by copying files — never merge Enhanced.
-2. Reuse from `windows-desktop` @ `7a790e185`: desktop `LiveTvStorage` actual, `--windows` bootstrap,
-   packaging helpers. Confirm libmpv header support for channel URLs.
-3. macOS builds need the Mac or a macOS CI runner (owner checks by hand).
-4. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
+1. [TEC-11](/TEC/issues/TEC-11) is ready to test: [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12)
+   → PM2 batches it for Tester3. On a pass, the tester merges it.
+2. After TEC-11 merges: settings/player wiring and Live TV UI issues; macOS builds need the Mac or a
+   macOS CI runner.
 
 ## How to build and test (Desktop)
 - Checks (one Gradle build at a time on beast); see AGENTS.md for the native-exclusion array.
