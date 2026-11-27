@@ -38,15 +38,20 @@ Enhanced (copy files only) for Windows and macOS M1.
 - 2026-11-27: [TEC-370](/TEC/issues/TEC-370) — Live TV settings page wired into SettingsScreen.kt.
   UI for managing M3U playlists, Xtream, Stalker sources, and EPG URLs; passwords masked with
   PasswordVisualTransformation; local-file picker hidden (D3 scope: URL-based only). Desktop compile
-  passed (`:composeApp:compileKotlinDesktop`). Branch ready for testing; PR to follow.
+  passed (`:composeApp:compileKotlinDesktop`). Branch `paperclip/TEC-370-livetv-settings-page` with
+  commits d4146c6ae, 92dc87977, 10eb9cebd ready for Tester3 verification. GitHub PR creation blocked
+  on agent-scoped auth (Architect to resolve).
 
-## Current state (2026-11-27)
+## Current state (2026-11-27, end of day)
 - `Dev` is `fe34af309` (PR #12 merge on top of PR #11 `baa29326c`): `AGENTS.md`,
   `PROGRESS.md`, `scripts/upstream-sync.sh`, the upstream `Dev` merge through `bcb930c2d`, and the
   Live TV data layer.
 - `paperclip/TEC-369-copy-live-tv-strings` is branch `00f47bfd9` with all `live_tv_*` localization
   strings copied from Enhanced. Ready for Tester3: PR `TEC-369: Copy Live TV strings from Enhanced`
   targets `Dev` base. 70 commits ahead of `Dev` (includes all prior TEC-11 work).
+- `paperclip/TEC-370-livetv-settings-page` is branch `10eb9cebd` with LiveTvSettingsPage wired into
+  SettingsScreen. Ready for Tester3 verification. PR body prepared with full template compliance.
+  GitHub PR creation blocked on agent-scoped auth.
 - `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
 - Live TV data layer on `Dev` from [TEC-11](/TEC/issues/TEC-11), no UI and nothing wired into a screen:
   M3U/Xtream/Stalker loaders in `features/livetv/`, EPG parsing incl. gzip, `AppFileCache` +
@@ -97,15 +102,13 @@ Enhanced (copy files only) for Windows and macOS M1.
   [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) are `MERGED`.
 
 ## Next steps
-1. Merge [TEC-369](/TEC/issues/TEC-369) PR (Live TV strings) to `Dev` after Tester3 verification.
-2. Wire the Live TV UI: [TEC-370](/TEC/issues/TEC-370) (settings/player wiring) — in progress.
-   - Copied `LiveTvSettingsPage.kt` from Enhanced, adapted to omit local file picker (D3 scope).
-   - Wired into SettingsScreen as child of Integrations page (SettingsPage.LiveTv enum).
-   - Added icons, UI state collection, and callbacks for both Mobile and Tablet layouts.
-   - Masks passwords/tokens in provider settings with `PasswordVisualTransformation`.
-   - Ready for local tests and design verification; player wiring deferred.
-3. macOS builds: test on Mac or a macOS CI runner; Parth checks by hand.
-4. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
+1. **GitHub PR creation:** Architect to grant agent-scoped GitHub auth for `createPullRequest` or manually
+   create PR for `paperclip/TEC-370-livetv-settings-page` targeting `Dev` base (PR body ready in Paperclip
+   comments). Then:
+   1. Merge [TEC-369](/TEC/issues/TEC-369) PR (Live TV strings) to `Dev` after Tester3 verification.
+   2. Merge [TEC-370](/TEC/issues/TEC-370) PR (Live TV settings) to `Dev` after Tester3 verification.
+2. macOS builds: test on Mac or a macOS CI runner; Parth checks by hand.
+3. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 
 ## How to build and test (Desktop)
 - Checks (one Gradle build at a time on beast); see AGENTS.md for the native-exclusion array.
