@@ -42,11 +42,17 @@ Enhanced (copy files only) for Windows and macOS M1.
   `SettingsScreen` but not passed into `MobileSettingsScreen` / `TabletSettingsScreen`. Opened
   [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) (`paperclip/TEC-370-livetv-settings-page`
   → `Dev`, includes TEC-369 strings). `:composeApp:compileKotlinDesktop` PASS with native exclusions.
+- 2026-11-27 (Senior Developer 3): Tester3 [TEC-416](/TEC/issues/TEC-416) failed acceptance step 7 —
+  invalid playlist/EPG URLs (e.g. `not-a-url`) were persisted. Added UI-only `http(s)://` validation in
+  `LiveTvSettingsPage` before `addPlaylistUrl` / `addEpgSource` (and URL playlist edit save); shows
+  `live_tv_settings_url_scheme_invalid`. Data layer / storage keys unchanged. Local
+  `:composeApp:compileKotlinDesktop` hit Kotlin daemon OOM on this shared machine (tried 6–10G heaps);
+  Tester3 re-runs AGENTS.md checks on the updated PR head.
 
 ## Current state (2026-11-27)
 - `Dev` is `64e7dc3a0` (PR #13 TEC-11 docs on top of PR #12 data layer).
 - [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) is open for TEC-370 (+ TEC-369 strings)
-  from `paperclip/TEC-370-livetv-settings-page`. Ready for PM2 → Tester3 batch.
+  from `paperclip/TEC-370-livetv-settings-page`. URL-validation fix pending push/retest after TEC-416 fail.
 - TEC-369 strings ship inside PR #14 (no separate TEC-369 PR).
 - `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
 - Live TV data layer on `Dev` from [TEC-11](/TEC/issues/TEC-11), no UI and nothing wired into a screen:
@@ -96,8 +102,9 @@ Enhanced (copy files only) for Windows and macOS M1.
   [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) are `MERGED`.
 
 ## Next steps
-1. PM2: add [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) ([TEC-370](/TEC/issues/TEC-370),
-   includes TEC-369 strings) to the next Tester3 nuvio verification batch; on PASS merge to `Dev`.
+1. PM2: re-batch [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) ([TEC-370](/TEC/issues/TEC-370))
+   for Tester3 after URL-validation fix; on PASS merge to `Dev`. Retest acceptance step 7 (empty +
+   invalid playlist/EPG URL must show validation message and not persist).
 2. macOS builds: test on Mac or a macOS CI runner; Parth checks by hand.
 3. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 

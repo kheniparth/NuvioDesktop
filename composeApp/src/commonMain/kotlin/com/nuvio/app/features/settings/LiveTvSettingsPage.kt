@@ -68,6 +68,7 @@ import nuvio.composeapp.generated.resources.live_tv_settings_playlist_type_local
 import nuvio.composeapp.generated.resources.live_tv_settings_playlist_type_url
 import nuvio.composeapp.generated.resources.live_tv_settings_playlist_url_label
 import nuvio.composeapp.generated.resources.live_tv_settings_save_playlist
+import nuvio.composeapp.generated.resources.live_tv_settings_url_scheme_invalid
 import nuvio.composeapp.generated.resources.live_tv_settings_section_epg
 import nuvio.composeapp.generated.resources.live_tv_settings_section_navigation
 import nuvio.composeapp.generated.resources.live_tv_settings_section_playlist
@@ -262,9 +263,11 @@ private fun LiveTvEpgSettingsRow(
     val verticalPadding = if (isTablet) 16.dp else 14.dp
     var draftName by rememberSaveable { mutableStateOf("") }
     var draftUrl by rememberSaveable { mutableStateOf("") }
+    var urlError by rememberSaveable { mutableStateOf(false) }
     val normalizedName = draftName.trim()
     val normalizedUrl = draftUrl.trim()
     val matchedChannelCount = uiState.channels.count { channel -> !uiState.epgPrograms[channel.id].isNullOrEmpty() }
+    val urlSchemeInvalidMessage = stringResource(Res.string.live_tv_settings_url_scheme_invalid)
 
     Column(
         modifier = Modifier
@@ -326,12 +329,24 @@ private fun LiveTvEpgSettingsRow(
 
         OutlinedTextField(
             value = draftUrl,
-            onValueChange = { draftUrl = it },
+            onValueChange = {
+                draftUrl = it
+                urlError = false
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            isError = urlError,
             label = { Text(stringResource(Res.string.live_tv_settings_epg_url_placeholder)) },
             colors = liveTvOutlinedTextFieldColors(),
         )
+
+        if (urlError) {
+            Text(
+                text = urlSchemeInvalidMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -339,11 +354,15 @@ private fun LiveTvEpgSettingsRow(
         ) {
             Button(
                 onClick = {
+                    if (!isHttpOrHttpsUrl(normalizedUrl)) {
+                        urlError = true
+                        return@Button
+                    }
                     LiveTvRepository.addEpgSource(normalizedName.takeIf(String::isNotBlank), normalizedUrl)
                     draftName = ""
                     draftUrl = ""
+                    urlError = false
                 },
-                enabled = normalizedUrl.isNotBlank(),
             ) {
                 Text(stringResource(Res.string.live_tv_settings_epg_add))
             }
@@ -570,8 +589,10 @@ private fun LiveTvPlaylistSourcesRow(
     val verticalPadding = if (isTablet) 16.dp else 14.dp
     var draftName by rememberSaveable { mutableStateOf("") }
     var draftUrl by rememberSaveable { mutableStateOf("") }
+    var urlError by rememberSaveable { mutableStateOf(false) }
     val normalizedName = draftName.trim()
     val normalizedUrl = draftUrl.trim()
+    val urlSchemeInvalidMessage = stringResource(Res.string.live_tv_settings_url_scheme_invalid)
 
     Column(
         modifier = Modifier
@@ -604,12 +625,24 @@ private fun LiveTvPlaylistSourcesRow(
 
         OutlinedTextField(
             value = draftUrl,
-            onValueChange = { draftUrl = it },
+            onValueChange = {
+                draftUrl = it
+                urlError = false
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            isError = urlError,
             label = { Text(stringResource(Res.string.live_tv_settings_playlist_placeholder)) },
             colors = liveTvOutlinedTextFieldColors(),
         )
+
+        if (urlError) {
+            Text(
+                text = urlSchemeInvalidMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -617,11 +650,15 @@ private fun LiveTvPlaylistSourcesRow(
         ) {
             Button(
                 onClick = {
+                    if (!isHttpOrHttpsUrl(normalizedUrl)) {
+                        urlError = true
+                        return@Button
+                    }
                     onUrlAdded(normalizedName.takeIf(String::isNotBlank), normalizedUrl)
                     draftName = ""
                     draftUrl = ""
+                    urlError = false
                 },
-                enabled = normalizedUrl.isNotBlank(),
             ) {
                 Text(stringResource(Res.string.live_tv_settings_add_url_playlist))
             }
@@ -667,6 +704,7 @@ private fun LiveTvPlaylistRow(
     var isEditing by rememberSaveable(playlist.id) { mutableStateOf(false) }
     var draftName by rememberSaveable(playlist.id) { mutableStateOf(playlist.name) }
     var draftSource by rememberSaveable(playlist.id) { mutableStateOf(playlist.source) }
+    var urlError by rememberSaveable(playlist.id) { mutableStateOf(false) }
     val sourceLabel = when (playlist.type) {
         LiveTvPlaylistType.Url -> playlist.source
         LiveTvPlaylistType.LocalFile -> stringResource(Res.string.live_tv_settings_playlist_source_local)
@@ -678,6 +716,7 @@ private fun LiveTvPlaylistRow(
             Res.string.live_tv_settings_playlist_disabled
         },
     )
+    val urlSchemeInvalidMessage = stringResource(Res.string.live_tv_settings_url_scheme_invalid)
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -695,12 +734,23 @@ private fun LiveTvPlaylistRow(
             if (playlist.type == LiveTvPlaylistType.Url) {
                 OutlinedTextField(
                     value = draftSource,
-                    onValueChange = { draftSource = it },
+                    onValueChange = {
+                        draftSource = it
+                        urlError = false
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
+                    isError = urlError,
                     label = { Text(stringResource(Res.string.live_tv_settings_playlist_url_label)) },
                     colors = liveTvOutlinedTextFieldColors(),
                 )
+                if (urlError) {
+                    Text(
+                        text = urlSchemeInvalidMessage,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
             } else {
                 Text(
                     text = sourceLabel,
@@ -711,8 +761,13 @@ private fun LiveTvPlaylistRow(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = {
+                        if (playlist.type == LiveTvPlaylistType.Url && !isHttpOrHttpsUrl(draftSource)) {
+                            urlError = true
+                            return@Button
+                        }
                         onUpdate(draftName, draftSource)
                         isEditing = false
+                        urlError = false
                     },
                     enabled = draftName.trim().isNotBlank() && draftSource.trim().isNotBlank(),
                 ) {
@@ -723,6 +778,7 @@ private fun LiveTvPlaylistRow(
                         draftName = playlist.name
                         draftSource = playlist.source
                         isEditing = false
+                        urlError = false
                     },
                 ) {
                     Text(stringResource(Res.string.live_tv_settings_cancel_edit))
@@ -799,6 +855,12 @@ private fun LiveTvPlaylistRow(
 
 private val LiveTvPlaylistEnabledColor = Color(0xFF2E7D32)
 private val LiveTvPlaylistDisabledColor = Color(0xFFC62828)
+
+private fun isHttpOrHttpsUrl(url: String): Boolean {
+    val normalized = url.trim()
+    return normalized.startsWith("https://", ignoreCase = true) ||
+        normalized.startsWith("http://", ignoreCase = true)
+}
 
 @Composable
 private fun liveTvOutlinedTextFieldColors() = OutlinedTextFieldDefaults.colors(

@@ -2760,6 +2760,7 @@
     <string name="live_tv_settings_playlist_url_label">Playlist URL</string>
     <string name="live_tv_settings_description">Channels from all configured playlists will appear in the Live TV tab.</string>
     <string name="live_tv_settings_add_url_playlist">Add URL</string>
+    <string name="live_tv_settings_url_scheme_invalid">Enter a valid http:// or https:// URL.</string>
     <string name="live_tv_settings_add_local_playlist">Add local M3U</string>
     <string name="live_tv_settings_configured_playlists">Configured playlists</string>
     <string name="live_tv_settings_no_playlists">No playlists configured yet.</string>
