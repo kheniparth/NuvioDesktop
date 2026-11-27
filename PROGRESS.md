@@ -1,6 +1,6 @@
 # NuvioDesktop progress
 
-Last updated: 2026-11-26. Single source of truth for picking Desktop fork work back up with any agent.
+Last updated: 2026-11-27. Single source of truth for picking Desktop fork work back up with any agent.
 Update it at the end of every work session (see [AGENTS.md](AGENTS.md)). Cross-repo plan and TV
 progress: `~/nuvio/nuvio-tv/PROGRESS.md` and `~/nuvio/nuvio-tv/LIVE_TV_PORT_PLAN.md`.
 
@@ -31,16 +31,26 @@ Enhanced (copy files only) for Windows and macOS M1.
   `8043b4215` (16 shared tests). Sub-tasks [TEC-97](/TEC/issues/TEC-97),
   [TEC-99](/TEC/issues/TEC-99) and [TEC-267](/TEC/issues/TEC-267) are done; Tester3 PASS and
   [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) merged into `Dev` as `fe34af309`.
+- 2026-11-27: [TEC-369](/TEC/issues/TEC-369) — copied all `live_tv_*` localization strings from Enhanced
+  (`windows-desktop` commit `7a790e185`) to this fork across 5 strings files and all supported language
+  locales. Strings cover UI elements: channel groups, search, filters, guide sections, sports categories.
+  Branch `paperclip/TEC-369-copy-live-tv-strings` ready for Tester3 verification; PR body prepared.
 
-## Current state (2026-11-26)
+## Current state (2026-11-27)
 - `Dev` is `fe34af309` (PR #12 merge on top of PR #11 `baa29326c`): `AGENTS.md`,
   `PROGRESS.md`, `scripts/upstream-sync.sh`, the upstream `Dev` merge through `bcb930c2d`, and the
   Live TV data layer.
+- `paperclip/TEC-369-copy-live-tv-strings` is branch `00f47bfd9` with all `live_tv_*` localization
+  strings copied from Enhanced. Ready for Tester3: PR `TEC-369: Copy Live TV strings from Enhanced`
+  targets `Dev` base. 70 commits ahead of `Dev` (includes all prior TEC-11 work).
 - `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
 - Live TV data layer on `Dev` from [TEC-11](/TEC/issues/TEC-11), no UI and nothing wired into a screen:
   M3U/Xtream/Stalker loaders in `features/livetv/`, EPG parsing incl. gzip, `AppFileCache` +
   `LiveTvStorage` actuals for desktop/Android/iOS, and `LiveTvStalkerGate` with a once-only 401
   re-handshake. The worktree `/home/techmuzz/nuvio/scratch/nuvio-desktop-tec-11` is no longer needed.
+- Live TV localization strings on `paperclip/TEC-369-copy-live-tv-strings` branch (not yet merged):
+  all `live_tv_*` and `settings_integrations_live_tv_*` keys across 5 strings files and all language
+  locales, ready for UI wiring ([TEC-370](/TEC/issues/TEC-370)).
 - Live TV storage keys: desktop and Android use store/preferences name `nuvio_live_tv`; iOS uses
   `NSUserDefaults`. Keys (`playlist_url`, `playlists_blob`, `stalker_settings`, `xtream_settings`,
   `epg_sources_blob`, …) are all profile-scoped through `ProfileScopedKey`.
@@ -83,9 +93,11 @@ Enhanced (copy files only) for Windows and macOS M1.
   [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) are `MERGED`.
 
 ## Next steps
-1. Wire the data layer: settings/player wiring and the Live TV UI issues — no screen calls the data
-   layer yet. macOS builds need the Mac or a macOS CI runner (owner checks by hand).
-2. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
+1. Merge [TEC-369](/TEC/issues/TEC-369) PR (Live TV strings) to `Dev` after Tester3 verification.
+2. Wire the Live TV UI: [TEC-370](/TEC/issues/TEC-370) (settings/player wiring) — consume the data
+   layer and strings to build settings screens and player UI. No screen calls the data layer yet.
+3. macOS builds: test on Mac or a macOS CI runner; Parth checks by hand.
+4. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 
 ## How to build and test (Desktop)
 - Checks (one Gradle build at a time on beast); see AGENTS.md for the native-exclusion array.
