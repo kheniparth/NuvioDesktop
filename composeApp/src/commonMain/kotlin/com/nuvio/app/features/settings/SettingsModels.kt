@@ -46,6 +46,7 @@ import nuvio.composeapp.generated.resources.compose_settings_page_continue_watch
 import nuvio.composeapp.generated.resources.compose_settings_page_homescreen
 import nuvio.composeapp.generated.resources.compose_settings_page_hover_preview
 import nuvio.composeapp.generated.resources.compose_settings_page_integrations
+import nuvio.composeapp.generated.resources.compose_settings_page_live_tv
 import nuvio.composeapp.generated.resources.compose_settings_page_licenses_attributions
 import nuvio.composeapp.generated.resources.compose_settings_page_mdblist_ratings
 import nuvio.composeapp.generated.resources.compose_settings_page_media_server
@@ -261,6 +262,11 @@ internal enum class SettingsPage(
         category = SettingsCategory.Services,
         parentPage = Root,
     ),
+    LiveTv(
+        titleRes = Res.string.compose_settings_page_live_tv,
+        category = SettingsCategory.Services,
+        parentPage = Integrations,
+    ),
 }
 
 internal val SettingsPage.opensInlineOnTablet: Boolean
@@ -313,4 +319,5 @@ internal val SettingsPage.icon: ImageVector
         SettingsPage.PlaybackVideo -> Icons.Default.VideoSettings
         SettingsPage.PlaybackBuffer -> Icons.Default.NetworkCheck
         SettingsPage.PlaybackP2p -> Icons.Default.Hub
+        SettingsPage.LiveTv -> Icons.Default.SmartDisplay
     }
