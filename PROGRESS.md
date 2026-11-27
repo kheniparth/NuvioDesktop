@@ -35,6 +35,10 @@ Enhanced (copy files only) for Windows and macOS M1.
   (`windows-desktop` commit `7a790e185`) to this fork across 5 strings files and all supported language
   locales. Strings cover UI elements: channel groups, search, filters, guide sections, sports categories.
   Branch `paperclip/TEC-369-copy-live-tv-strings` ready for Tester3 verification; PR body prepared.
+- 2026-11-27: [TEC-370](/TEC/issues/TEC-370) — Live TV settings page wired into SettingsScreen.kt.
+  UI for managing M3U playlists, Xtream, Stalker sources, and EPG URLs; passwords masked with
+  PasswordVisualTransformation; local-file picker hidden (D3 scope: URL-based only). Desktop compile
+  passed (`:composeApp:compileKotlinDesktop`). Branch ready for testing; PR to follow.
 
 ## Current state (2026-11-27)
 - `Dev` is `fe34af309` (PR #12 merge on top of PR #11 `baa29326c`): `AGENTS.md`,
