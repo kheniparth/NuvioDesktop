@@ -93,6 +93,7 @@ import com.nuvio.app.features.trakt.TraktAuthUiState
 import com.nuvio.app.features.trakt.TraktAuthRepository
 import com.nuvio.app.features.trakt.TraktCommentsSettings
 import com.nuvio.app.features.livetv.LiveTvRepository
+import com.nuvio.app.features.livetv.LiveTvUiState
 import com.nuvio.app.features.tracking.TrackingSettingsRepository
 import com.nuvio.app.features.tracking.TrackingSettingsUiState
 import com.nuvio.app.features.tmdb.TmdbSettings
@@ -425,6 +426,7 @@ fun SettingsScreen(
                         traktCommentsEnabled = traktCommentsEnabled,
                         mdbListConnected = mdbListConnected,
                         trackingSettingsUiState = trackingSettingsUiState,
+                        liveTvUiState = liveTvUiState,
                         homescreenHeroEnabled = homescreenSettingsUiState.heroEnabled,
                         homescreenShowCatalogType = homescreenSettingsUiState.showCatalogType,
                         homescreenHideUnreleasedContent = homescreenSettingsUiState.hideUnreleasedContent,
@@ -471,6 +473,7 @@ fun SettingsScreen(
                         traktCommentsEnabled = traktCommentsEnabled,
                         mdbListConnected = mdbListConnected,
                         trackingSettingsUiState = trackingSettingsUiState,
+                        liveTvUiState = liveTvUiState,
                         homescreenHeroEnabled = homescreenSettingsUiState.heroEnabled,
                         homescreenShowCatalogType = homescreenSettingsUiState.showCatalogType,
                         homescreenHideUnreleasedContent = homescreenSettingsUiState.hideUnreleasedContent,
@@ -529,6 +532,7 @@ private fun MobileSettingsScreen(
     traktCommentsEnabled: Boolean,
     mdbListConnected: Boolean,
     trackingSettingsUiState: TrackingSettingsUiState,
+    liveTvUiState: LiveTvUiState,
     homescreenHeroEnabled: Boolean,
     homescreenShowCatalogType: Boolean,
     homescreenHideUnreleasedContent: Boolean,
@@ -894,6 +898,7 @@ private fun TabletSettingsScreen(
     traktCommentsEnabled: Boolean,
     mdbListConnected: Boolean,
     trackingSettingsUiState: TrackingSettingsUiState,
+    liveTvUiState: LiveTvUiState,
     homescreenHeroEnabled: Boolean,
     homescreenShowCatalogType: Boolean,
     homescreenHideUnreleasedContent: Boolean,

@@ -37,29 +37,23 @@ Enhanced (copy files only) for Windows and macOS M1.
   Branch `paperclip/TEC-369-copy-live-tv-strings` ready for Tester3 verification; PR body prepared.
 - 2026-11-27: [TEC-370](/TEC/issues/TEC-370) — Live TV settings page wired into SettingsScreen.kt.
   UI for managing M3U playlists, Xtream, Stalker sources, and EPG URLs; passwords masked with
-  PasswordVisualTransformation; local-file picker hidden (D3 scope: URL-based only). Desktop compile
-  passed (`:composeApp:compileKotlinDesktop`). Branch `paperclip/TEC-370-livetv-settings-page` with
-  commits d4146c6ae, 92dc87977, 10eb9cebd ready for Tester3 verification. GitHub PR creation blocked
-  on agent-scoped auth (Architect to resolve).
+  PasswordVisualTransformation; local-file picker hidden (D3 scope: URL-based only).
+- 2026-11-27 (Senior Developer 3): Fixed compile break — `liveTvUiState` was collected in
+  `SettingsScreen` but not passed into `MobileSettingsScreen` / `TabletSettingsScreen`. Opened
+  [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) (`paperclip/TEC-370-livetv-settings-page`
+  → `Dev`, includes TEC-369 strings). `:composeApp:compileKotlinDesktop` PASS with native exclusions.
 
-## Current state (2026-11-27, end of day)
-- `Dev` is `fe34af309` (PR #12 merge on top of PR #11 `baa29326c`): `AGENTS.md`,
-  `PROGRESS.md`, `scripts/upstream-sync.sh`, the upstream `Dev` merge through `bcb930c2d`, and the
-  Live TV data layer.
-- `paperclip/TEC-369-copy-live-tv-strings` is branch `00f47bfd9` with all `live_tv_*` localization
-  strings copied from Enhanced. Ready for Tester3: PR `TEC-369: Copy Live TV strings from Enhanced`
-  targets `Dev` base. 70 commits ahead of `Dev` (includes all prior TEC-11 work).
-- `paperclip/TEC-370-livetv-settings-page` is branch `10eb9cebd` with LiveTvSettingsPage wired into
-  SettingsScreen. Ready for Tester3 verification. PR body prepared with full template compliance.
-  GitHub PR creation blocked on agent-scoped auth.
+## Current state (2026-11-27)
+- `Dev` is `64e7dc3a0` (PR #13 TEC-11 docs on top of PR #12 data layer).
+- [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) is open for TEC-370 (+ TEC-369 strings)
+  from `paperclip/TEC-370-livetv-settings-page`. Ready for PM2 → Tester3 batch.
+- TEC-369 strings ship inside PR #14 (no separate TEC-369 PR).
 - `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
 - Live TV data layer on `Dev` from [TEC-11](/TEC/issues/TEC-11), no UI and nothing wired into a screen:
   M3U/Xtream/Stalker loaders in `features/livetv/`, EPG parsing incl. gzip, `AppFileCache` +
   `LiveTvStorage` actuals for desktop/Android/iOS, and `LiveTvStalkerGate` with a once-only 401
   re-handshake. The worktree `/home/techmuzz/nuvio/scratch/nuvio-desktop-tec-11` is no longer needed.
-- Live TV localization strings on `paperclip/TEC-369-copy-live-tv-strings` branch (not yet merged):
-  all `live_tv_*` and `settings_integrations_live_tv_*` keys across 5 strings files and all language
-  locales, ready for UI wiring ([TEC-370](/TEC/issues/TEC-370)).
+- Live TV localization strings for TEC-369 are on the TEC-370 branch / PR #14 (not yet merged to `Dev`).
 - Live TV storage keys: desktop and Android use store/preferences name `nuvio_live_tv`; iOS uses
   `NSUserDefaults`. Keys (`playlist_url`, `playlists_blob`, `stalker_settings`, `xtream_settings`,
   `epg_sources_blob`, …) are all profile-scoped through `ProfileScopedKey`.
@@ -102,11 +96,8 @@ Enhanced (copy files only) for Windows and macOS M1.
   [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) are `MERGED`.
 
 ## Next steps
-1. **GitHub PR creation:** Architect to grant agent-scoped GitHub auth for `createPullRequest` or manually
-   create PR for `paperclip/TEC-370-livetv-settings-page` targeting `Dev` base (PR body ready in Paperclip
-   comments). Then:
-   1. Merge [TEC-369](/TEC/issues/TEC-369) PR (Live TV strings) to `Dev` after Tester3 verification.
-   2. Merge [TEC-370](/TEC/issues/TEC-370) PR (Live TV settings) to `Dev` after Tester3 verification.
+1. PM2: add [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) ([TEC-370](/TEC/issues/TEC-370),
+   includes TEC-369 strings) to the next Tester3 nuvio verification batch; on PASS merge to `Dev`.
 2. macOS builds: test on Mac or a macOS CI runner; Parth checks by hand.
 3. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 
