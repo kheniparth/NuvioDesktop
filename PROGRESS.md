@@ -94,8 +94,12 @@ Enhanced (copy files only) for Windows and macOS M1.
 
 ## Next steps
 1. Merge [TEC-369](/TEC/issues/TEC-369) PR (Live TV strings) to `Dev` after Tester3 verification.
-2. Wire the Live TV UI: [TEC-370](/TEC/issues/TEC-370) (settings/player wiring) — consume the data
-   layer and strings to build settings screens and player UI. No screen calls the data layer yet.
+2. Wire the Live TV UI: [TEC-370](/TEC/issues/TEC-370) (settings/player wiring) — in progress.
+   - Copied `LiveTvSettingsPage.kt` from Enhanced, adapted to omit local file picker (D3 scope).
+   - Wired into SettingsScreen as child of Integrations page (SettingsPage.LiveTv enum).
+   - Added icons, UI state collection, and callbacks for both Mobile and Tablet layouts.
+   - Masks passwords/tokens in provider settings with `PasswordVisualTransformation`.
+   - Ready for local tests and design verification; player wiring deferred.
 3. macOS builds: test on Mac or a macOS CI runner; Parth checks by hand.
 4. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 
