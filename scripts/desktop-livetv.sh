@@ -48,13 +48,25 @@ app_running() {
     return 0
   fi
   if [[ -n "${NUVIO_DESKTOP_RUNNING_CHECK_PATTERN:-}" ]]; then
+    if ! command -v pgrep >/dev/null 2>&1; then
+      echo "Cannot check if app is running: pgrep not found." >&2
+      exit 3
+    fi
     pgrep -f "$NUVIO_DESKTOP_RUNNING_CHECK_PATTERN" >/dev/null 2>&1
     return
   fi
   if grep -qi microsoft /proc/version 2>/dev/null; then
+    if ! command -v tasklist.exe >/dev/null 2>&1; then
+      echo "Cannot check if app is running: tasklist.exe not available." >&2
+      exit 3
+    fi
     # Avoid grep -q: early close SIGPIPEs tasklist and pipefail yields 141 ("not running").
     tasklist.exe 2>/dev/null | grep -i '^Nuvio\.exe' >/dev/null
     return
+  fi
+  if ! command -v pgrep >/dev/null 2>&1; then
+    echo "Cannot check if app is running: pgrep not found." >&2
+    exit 3
   fi
   pgrep -f 'com.nuvio.app.MainKt' >/dev/null 2>&1
 }
