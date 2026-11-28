@@ -52,7 +52,8 @@ app_running() {
     return
   fi
   if grep -qi microsoft /proc/version 2>/dev/null; then
-    tasklist.exe 2>/dev/null | grep -qi '^Nuvio\.exe'
+    # Avoid grep -q: early close SIGPIPEs tasklist and pipefail yields 141 ("not running").
+    tasklist.exe 2>/dev/null | grep -i '^Nuvio\.exe' >/dev/null
     return
   fi
   pgrep -f 'com.nuvio.app.MainKt' >/dev/null 2>&1
