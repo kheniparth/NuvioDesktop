@@ -35,6 +35,8 @@ PERFORMANCE_FINDINGS.md
 scripts/*
 !scripts/sign-ios-device-app.py
 !scripts/upstream-sync.sh
+!scripts/desktop-livetv.sh
+!scripts/desktop_livetv.py
 iosApp/Configuration/DeviceSigning.local.json
 
 # Local MPVKit iOS build environment (sparse APFS image, see MPVKit docs)
