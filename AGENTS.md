@@ -54,3 +54,8 @@ is not enough. Required headings: `Summary`, `PR type`, `Why`, `Desktop scope`, 
 `UI / behavior impact`, `Policy check`, `Scope boundaries`, `Testing`, `Screenshots / Video`,
 `Breaking changes`, `Linked issues`. Check exactly one PR type, at least one UI / behavior impact box, and
 every Policy check box. Keep the handoff block in the body as well.
+
+## Live TV sources
+
+- Live TV uses the stalker project's M3U/Xtream proxy only.
+- Never make a direct Stalker portal connection (portal URL + MAC/token, `new.gprod.co`) in code, scripts, tests or device setup. If a task seems to need one, stop and raise it on the issue instead.
