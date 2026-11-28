@@ -92,6 +92,8 @@ import com.nuvio.app.features.simkl.SimklAuthUiState
 import com.nuvio.app.features.trakt.TraktAuthUiState
 import com.nuvio.app.features.trakt.TraktAuthRepository
 import com.nuvio.app.features.trakt.TraktCommentsSettings
+import com.nuvio.app.features.livetv.LiveTvRepository
+import com.nuvio.app.features.livetv.LiveTvUiState
 import com.nuvio.app.features.tracking.TrackingSettingsRepository
 import com.nuvio.app.features.tracking.TrackingSettingsUiState
 import com.nuvio.app.features.tmdb.TmdbSettings
@@ -254,6 +256,10 @@ fun SettingsScreen(
         }.collectAsStateWithLifecycle()
         val profileSettingsState by remember {
             ProfileRepository.state
+        }.collectAsStateWithLifecycle()
+        val liveTvUiState by remember {
+            LiveTvRepository.ensureLoaded()
+            LiveTvRepository.uiState
         }.collectAsStateWithLifecycle()
 
         LaunchedEffect(homescreenCatalogRefreshKey) {
@@ -420,6 +426,7 @@ fun SettingsScreen(
                         traktCommentsEnabled = traktCommentsEnabled,
                         mdbListConnected = mdbListConnected,
                         trackingSettingsUiState = trackingSettingsUiState,
+                        liveTvUiState = liveTvUiState,
                         homescreenHeroEnabled = homescreenSettingsUiState.heroEnabled,
                         homescreenShowCatalogType = homescreenSettingsUiState.showCatalogType,
                         homescreenHideUnreleasedContent = homescreenSettingsUiState.hideUnreleasedContent,
@@ -466,6 +473,7 @@ fun SettingsScreen(
                         traktCommentsEnabled = traktCommentsEnabled,
                         mdbListConnected = mdbListConnected,
                         trackingSettingsUiState = trackingSettingsUiState,
+                        liveTvUiState = liveTvUiState,
                         homescreenHeroEnabled = homescreenSettingsUiState.heroEnabled,
                         homescreenShowCatalogType = homescreenSettingsUiState.showCatalogType,
                         homescreenHideUnreleasedContent = homescreenSettingsUiState.hideUnreleasedContent,
@@ -524,6 +532,7 @@ private fun MobileSettingsScreen(
     traktCommentsEnabled: Boolean,
     mdbListConnected: Boolean,
     trackingSettingsUiState: TrackingSettingsUiState,
+    liveTvUiState: LiveTvUiState,
     homescreenHeroEnabled: Boolean,
     homescreenShowCatalogType: Boolean,
     homescreenHideUnreleasedContent: Boolean,
@@ -787,6 +796,7 @@ private fun MobileSettingsScreen(
                     onTmdbClick = { onPageChange(SettingsPage.TmdbEnrichment) },
                     onMdbListClick = { onPageChange(SettingsPage.MdbListRatings) },
                     onDebridClick = { onPageChange(SettingsPage.Debrid) },
+                    onLiveTvClick = { onPageChange(SettingsPage.LiveTv) },
                 )
                 SettingsPage.TmdbEnrichment -> tmdbSettingsContent(
                     isTablet = false,
@@ -808,6 +818,10 @@ private fun MobileSettingsScreen(
                     commentsEnabled = traktCommentsEnabled,
                     mdbListConnected = mdbListConnected,
                     onCommentsEnabledChange = TraktCommentsSettings::setEnabled,
+                )
+                SettingsPage.LiveTv -> liveTvSettingsContent(
+                    isTablet = false,
+                    uiState = liveTvUiState,
                 )
             }
         }
@@ -884,6 +898,7 @@ private fun TabletSettingsScreen(
     traktCommentsEnabled: Boolean,
     mdbListConnected: Boolean,
     trackingSettingsUiState: TrackingSettingsUiState,
+    liveTvUiState: LiveTvUiState,
     homescreenHeroEnabled: Boolean,
     homescreenShowCatalogType: Boolean,
     homescreenHideUnreleasedContent: Boolean,
@@ -1217,6 +1232,7 @@ private fun TabletSettingsScreen(
                             onTmdbClick = { onPageChange(SettingsPage.TmdbEnrichment) },
                             onMdbListClick = { onPageChange(SettingsPage.MdbListRatings) },
                             onDebridClick = { onPageChange(SettingsPage.Debrid) },
+                            onLiveTvClick = { onPageChange(SettingsPage.LiveTv) },
                         )
                         SettingsPage.TmdbEnrichment -> tmdbSettingsContent(
                             isTablet = true,
@@ -1238,6 +1254,10 @@ private fun TabletSettingsScreen(
                             commentsEnabled = traktCommentsEnabled,
                             mdbListConnected = mdbListConnected,
                             onCommentsEnabledChange = TraktCommentsSettings::setEnabled,
+                        )
+                        SettingsPage.LiveTv -> liveTvSettingsContent(
+                            isTablet = true,
+                            uiState = liveTvUiState,
                         )
                     }
                 }

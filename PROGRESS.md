@@ -1,6 +1,6 @@
 # NuvioDesktop progress
 
-Last updated: 2026-11-26. Single source of truth for picking Desktop fork work back up with any agent.
+Last updated: 2026-11-27. Single source of truth for picking Desktop fork work back up with any agent.
 Update it at the end of every work session (see [AGENTS.md](AGENTS.md)). Cross-repo plan and TV
 progress: `~/nuvio/nuvio-tv/PROGRESS.md` and `~/nuvio/nuvio-tv/LIVE_TV_PORT_PLAN.md`.
 
@@ -31,16 +31,35 @@ Enhanced (copy files only) for Windows and macOS M1.
   `8043b4215` (16 shared tests). Sub-tasks [TEC-97](/TEC/issues/TEC-97),
   [TEC-99](/TEC/issues/TEC-99) and [TEC-267](/TEC/issues/TEC-267) are done; Tester3 PASS and
   [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) merged into `Dev` as `fe34af309`.
+- 2026-11-27: [TEC-369](/TEC/issues/TEC-369) — copied all `live_tv_*` localization strings from Enhanced
+  (`windows-desktop` commit `7a790e185`) to this fork across 5 strings files and all supported language
+  locales. Strings cover UI elements: channel groups, search, filters, guide sections, sports categories.
+  Branch `paperclip/TEC-369-copy-live-tv-strings` ready for Tester3 verification; PR body prepared.
+- 2026-11-27: [TEC-370](/TEC/issues/TEC-370) — Live TV settings page wired into SettingsScreen.kt.
+  UI for managing M3U playlists, Xtream, Stalker sources, and EPG URLs; passwords masked with
+  PasswordVisualTransformation; local-file picker hidden (D3 scope: URL-based only).
+- 2026-11-27 (Senior Developer 3): Fixed compile break — `liveTvUiState` was collected in
+  `SettingsScreen` but not passed into `MobileSettingsScreen` / `TabletSettingsScreen`. Opened
+  [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) (`paperclip/TEC-370-livetv-settings-page`
+  → `Dev`, includes TEC-369 strings). `:composeApp:compileKotlinDesktop` PASS with native exclusions.
+- 2026-11-27 (Senior Developer 3): Tester3 [TEC-416](/TEC/issues/TEC-416) failed acceptance step 7 —
+  invalid playlist/EPG URLs (e.g. `not-a-url`) were persisted. Added UI-only `http(s)://` validation in
+  `LiveTvSettingsPage` before `addPlaylistUrl` / `addEpgSource` (and URL playlist edit save); shows
+  `live_tv_settings_url_scheme_invalid`. Data layer / storage keys unchanged. Local
+  `:composeApp:compileKotlinDesktop` hit Kotlin daemon OOM on this shared machine (tried 6–10G heaps);
+  Tester3 re-runs AGENTS.md checks on the updated PR head.
 
-## Current state (2026-11-26)
-- `Dev` is `fe34af309` (PR #12 merge on top of PR #11 `baa29326c`): `AGENTS.md`,
-  `PROGRESS.md`, `scripts/upstream-sync.sh`, the upstream `Dev` merge through `bcb930c2d`, and the
-  Live TV data layer.
+## Current state (2026-11-27)
+- `Dev` is `64e7dc3a0` (PR #13 TEC-11 docs on top of PR #12 data layer).
+- [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) is open for TEC-370 (+ TEC-369 strings)
+  from `paperclip/TEC-370-livetv-settings-page`. URL-validation fix pending push/retest after TEC-416 fail.
+- TEC-369 strings ship inside PR #14 (no separate TEC-369 PR).
 - `sync/upstream-20261120` stays at `e69090674` (merged; not rebased or force-pushed).
 - Live TV data layer on `Dev` from [TEC-11](/TEC/issues/TEC-11), no UI and nothing wired into a screen:
   M3U/Xtream/Stalker loaders in `features/livetv/`, EPG parsing incl. gzip, `AppFileCache` +
   `LiveTvStorage` actuals for desktop/Android/iOS, and `LiveTvStalkerGate` with a once-only 401
   re-handshake. The worktree `/home/techmuzz/nuvio/scratch/nuvio-desktop-tec-11` is no longer needed.
+- Live TV localization strings for TEC-369 are on the TEC-370 branch / PR #14 (not yet merged to `Dev`).
 - Live TV storage keys: desktop and Android use store/preferences name `nuvio_live_tv`; iOS uses
   `NSUserDefaults`. Keys (`playlist_url`, `playlists_blob`, `stalker_settings`, `xtream_settings`,
   `epg_sources_blob`, …) are all profile-scoped through `ProfileScopedKey`.
@@ -83,9 +102,11 @@ Enhanced (copy files only) for Windows and macOS M1.
   [PR #12](https://github.com/kheniparth/NuvioDesktop/pull/12) are `MERGED`.
 
 ## Next steps
-1. Wire the data layer: settings/player wiring and the Live TV UI issues — no screen calls the data
-   layer yet. macOS builds need the Mac or a macOS CI runner (owner checks by hand).
-2. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
+1. PM2: re-batch [PR #14](https://github.com/kheniparth/NuvioDesktop/pull/14) ([TEC-370](/TEC/issues/TEC-370))
+   for Tester3 after URL-validation fix; on PASS merge to `Dev`. Retest acceptance step 7 (empty +
+   invalid playlist/EPG URL must show validation message and not persist).
+2. macOS builds: test on Mac or a macOS CI runner; Parth checks by hand.
+3. Future upstream syncs: `bash scripts/upstream-sync.sh` from a clean `Dev`, then open the sync PR.
 
 ## How to build and test (Desktop)
 - Checks (one Gradle build at a time on beast); see AGENTS.md for the native-exclusion array.
